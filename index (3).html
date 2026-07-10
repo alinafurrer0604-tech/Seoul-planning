@@ -1,0 +1,1250 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#8ba888" />
+  <meta name="description" content="Seoul & Asia Planner 2026 – persönlicher Kalender- und Reiseplaner für den Zeitraum 10.07.–19.10.2026." />
+  <title>Seoul &amp; Asia Planner 2026</title>
+  <style>
+    /* ============================================================
+       Design-Tokens: Salbeigrün, Pastellrosa, Cremeweiß, Neutraltöne
+       ============================================================ */
+    :root {
+      --sage:        #8ba888;
+      --sage-soft:   #d8e5d6;
+      --sage-tint:   #eef4ec;
+      --pink:        #e6b8bf;
+      --pink-soft:   #f3dbdf;
+      --pink-tint:   #fbeef0;
+      --lavender:    #c8c1e0;
+      --lavender-soft:#e2ddf0;
+      --cream:       #faf6ef;
+      --cream-2:     #f4eee4;
+      --card:        #ffffff;
+      --ink:         #4a4a48;
+      --ink-soft:    #7a7975;
+      --ink-faint:   #a9a7a1;
+      --line:        #e7e1d7;
+      --shadow:      0 4px 18px rgba(90, 80, 60, 0.08);
+      --shadow-lg:   0 12px 40px rgba(90, 80, 60, 0.18);
+      --radius:      16px;
+      --radius-sm:   10px;
+      --gold:        #cb9a5b;
+      --ok:          #6fa06a;
+      --err:         #c06a6a;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(160deg, var(--cream) 0%, var(--cream-2) 100%);
+      color: var(--ink);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.01em; }
+    button { font-family: inherit; cursor: pointer; }
+    input, select, textarea { font-family: inherit; font-size: 1rem; }
+
+    /* ---------- Kopfbereich & Navigation ---------- */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(250, 246, 239, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .header-inner {
+      max-width: 1180px; margin: 0 auto;
+      padding: 14px 20px 0;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .brand-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand .logo {
+      width: 38px; height: 38px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--sage), var(--pink));
+      display: grid; place-items: center; font-size: 20px;
+      box-shadow: var(--shadow);
+    }
+    .brand h1 { font-size: 1.2rem; }
+    .brand .sub { font-size: 0.75rem; color: var(--ink-soft); }
+
+    .settings-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid var(--line); background: var(--card); color: var(--ink);
+      padding: 8px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 6px; transition: .15s;
+    }
+    .btn:hover { border-color: var(--sage); background: var(--sage-tint); }
+    .btn.primary {
+      background: var(--sage); border-color: var(--sage); color: #fff;
+    }
+    .btn.primary:hover { background: #7a9877; }
+    .btn.danger:hover { border-color: var(--err); background: #f9eded; color: var(--err); }
+    .btn.ghost { background: transparent; }
+
+    nav.tabs { display: flex; gap: 4px; }
+    nav.tabs button {
+      border: none; background: transparent; color: var(--ink-soft);
+      padding: 12px 18px; font-size: 0.92rem; font-weight: 500;
+      border-bottom: 3px solid transparent; margin-bottom: -1px;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    nav.tabs button:hover { color: var(--ink); }
+    nav.tabs button.active { color: var(--sage); border-bottom-color: var(--sage); }
+
+    /* ---------- Layout ---------- */
+    main { max-width: 1180px; margin: 0 auto; padding: 22px 20px 80px; }
+    .view { display: none; }
+    .view.active { display: block; animation: fade .25s ease; }
+    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    .card {
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); border: 1px solid var(--line);
+    }
+    .section-title {
+      display: flex; align-items: center; gap: 10px; justify-content: space-between;
+      margin: 26px 0 12px;
+    }
+    .section-title h2 { font-size: 1.05rem; }
+    .section-title .hint { font-size: 0.8rem; color: var(--ink-soft); font-weight: 400; }
+
+    /* ---------- Countdowns ---------- */
+    .countdown-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 12px;
+    }
+    .cd-card {
+      padding: 16px; border-radius: var(--radius); background: var(--card);
+      border: 1px solid var(--line); box-shadow: var(--shadow); position: relative;
+    }
+    .cd-card .cd-num { font-size: 1.6rem; font-weight: 700; color: var(--sage); line-height: 1.1; }
+    .cd-card .cd-title { font-weight: 600; margin-top: 2px; }
+    .cd-card .cd-note { font-size: 0.78rem; color: var(--ink-soft); margin-top: 4px; }
+    .cd-card .cd-actions {
+      position: absolute; top: 10px; right: 10px; display: flex; gap: 3px; opacity: 0; transition: .15s;
+    }
+    .cd-card:hover .cd-actions { opacity: 1; }
+    .cd-card .cd-actions button {
+      border: none; background: var(--cream-2); width: 24px; height: 24px; border-radius: 7px;
+      font-size: 0.75rem; color: var(--ink-soft); display: grid; place-items: center;
+    }
+    .cd-card .cd-actions button:hover { background: var(--sage-soft); color: var(--ink); }
+    .cd-card.next {
+      background: linear-gradient(135deg, var(--sage-tint), var(--pink-tint));
+      border-color: var(--sage);
+    }
+    .cd-card.next .badge-next {
+      display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: .05em;
+      text-transform: uppercase; color: var(--sage); background: #fff;
+      padding: 2px 8px; border-radius: 999px; margin-bottom: 6px;
+    }
+    .cd-card.past .cd-num { color: var(--ink-faint); }
+    .cd-card.today .cd-num { color: var(--pink); }
+
+    /* ---------- Kalender ---------- */
+    .cal-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 6px 0 14px; }
+    .cal-controls .mname { font-size: 1.15rem; font-weight: 600; min-width: 170px; text-align: center; }
+    .cal-controls button {
+      border: 1px solid var(--line); background: var(--card); width: 40px; height: 40px;
+      border-radius: 12px; font-size: 1.1rem; color: var(--ink);
+    }
+    .cal-controls button:hover:not(:disabled) { background: var(--sage-tint); border-color: var(--sage); }
+    .cal-controls button:disabled { opacity: .35; cursor: not-allowed; }
+
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .cal-head {
+      text-align: center; font-size: 0.72rem; font-weight: 600; color: var(--ink-soft);
+      text-transform: uppercase; letter-spacing: .04em; padding: 4px 0;
+    }
+    .cal-cell {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-sm);
+      min-height: 96px; padding: 6px; display: flex; flex-direction: column; gap: 3px;
+      cursor: pointer; transition: .12s; position: relative; overflow: hidden;
+    }
+    .cal-cell:hover.editable { border-color: var(--sage); box-shadow: var(--shadow); }
+    .cal-cell.outside { background: repeating-linear-gradient(45deg, #f3efe7, #f3efe7 6px, #efe9df 6px, #efe9df 12px); color: var(--ink-faint); cursor: default; opacity: .6; }
+    .cal-cell.workday { background: var(--sage-tint); }
+    .cal-cell.weekend { background: var(--pink-tint); }
+    .cal-cell.holiday { background: #fdf4e5; }
+    .cal-cell.today-cell { outline: 2px solid var(--sage); outline-offset: -2px; }
+    .cal-daynum { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); }
+    .cal-cell.today-cell .cal-daynum { color: var(--sage); }
+    .holiday-tag { font-size: 0.62rem; color: var(--gold); font-weight: 600; line-height: 1.15; }
+    .work-tag { font-size: 0.58rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .03em; }
+
+    .ev-bar {
+      font-size: 0.68rem; padding: 3px 6px; border-radius: 6px; font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 3px solid;
+    }
+    .ev-trip { background: var(--sage-soft); border-color: var(--sage); color: #3f5a3d; }
+    .ev-appointment { background: var(--pink-soft); border-color: var(--pink); color: #7a4650; }
+    .ev-todo { background: var(--lavender-soft); border-color: var(--lavender); color: #55507a; }
+    .ev-bar.done { opacity: .45; text-decoration: line-through; }
+    .ev-bar.span-mid, .ev-bar.span-end, .ev-bar.span-start { border-radius: 3px; }
+    .ev-more { font-size: 0.64rem; color: var(--ink-soft); font-weight: 600; padding-left: 3px; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; font-size: 0.75rem; color: var(--ink-soft); }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend .dot { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+
+    /* ---------- Freie Slots ---------- */
+    .slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    .slot-card { padding: 16px; }
+    .slot-card .slot-type {
+      display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 999px; margin-bottom: 8px;
+    }
+    .type-weekend { background: var(--pink-soft); color: #7a4650; }
+    .type-long { background: var(--sage-soft); color: #3f5a3d; }
+    .type-single { background: var(--lavender-soft); color: #55507a; }
+    .slot-card .slot-range { font-weight: 600; font-size: 1rem; }
+    .slot-card .slot-days { font-size: 0.8rem; color: var(--ink-soft); margin: 2px 0 10px; }
+    .slot-suggest { border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 4px; }
+    .slot-suggest .sg-label { font-size: 0.72rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+    .sg-chip {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      background: var(--sage-tint); border: 1px solid var(--sage-soft); border-radius: var(--radius-sm);
+      padding: 8px 10px; margin-bottom: 6px; font-size: 0.82rem; transition: .12s;
+    }
+    .sg-chip:hover { border-color: var(--sage); background: var(--sage-soft); }
+    .sg-chip button {
+      border: none; background: var(--sage); color: #fff; border-radius: 999px;
+      padding: 4px 10px; font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+    }
+    .sg-chip .sg-dur { font-size: 0.7rem; color: var(--ink-soft); }
+
+    /* ---------- Ideenpool ---------- */
+    .ideas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .idea-card { padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+    .idea-card .idea-top { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+    .idea-card h3 { font-size: 1rem; }
+    .idea-card .idea-dur {
+      font-size: 0.68rem; font-weight: 700; background: var(--cream-2); color: var(--ink-soft);
+      padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+    }
+    .idea-card .idea-note { font-size: 0.83rem; color: var(--ink-soft); }
+    .idea-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+    .idea-tags .tag { font-size: 0.68rem; background: var(--pink-tint); color: #7a4650; padding: 2px 8px; border-radius: 999px; }
+    .idea-card .idea-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .idea-card .idea-actions .btn { padding: 6px 12px; font-size: 0.78rem; }
+
+    /* ---------- Modal ---------- */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(60, 55, 45, 0.45);
+      backdrop-filter: blur(3px); display: none; align-items: flex-start; justify-content: center;
+      z-index: 100; padding: 24px 14px; overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow-lg);
+      width: 100%; max-width: 480px; margin: auto; animation: pop .2s ease;
+    }
+    @keyframes pop { from { opacity: 0; transform: scale(.97) translateY(6px); } to { opacity: 1; transform: none; } }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+    .modal-head h3 { font-size: 1.05rem; }
+    .modal-close { border: none; background: var(--cream-2); width: 32px; height: 32px; border-radius: 9px; font-size: 1.1rem; color: var(--ink-soft); }
+    .modal-close:hover { background: var(--pink-soft); color: var(--ink); }
+    .modal-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+    .modal-foot { padding: 16px 20px; border-top: 1px solid var(--line); display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+    .modal-foot .spacer { flex: 1; }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); }
+    .field label .req { color: var(--pink); }
+    .field input, .field select, .field textarea {
+      border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px;
+      background: var(--cream); color: var(--ink); width: 100%;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--sage-soft); border-color: var(--sage); }
+    .field textarea { resize: vertical; min-height: 64px; }
+    .field.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .checkline { display: flex; align-items: center; gap: 9px; font-size: 0.86rem; color: var(--ink); }
+    .checkline input { width: auto; }
+    .field-err { color: var(--err); font-size: 0.8rem; padding: 8px 12px; background: #f9eded; border-radius: var(--radius-sm); display: none; }
+    .field-err.show { display: block; }
+
+    /* ---------- Toast ---------- */
+    #toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+    .toast {
+      background: var(--ink); color: #fff; padding: 11px 18px; border-radius: 999px;
+      font-size: 0.85rem; box-shadow: var(--shadow-lg); animation: slideUp .25s ease;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .toast.ok { background: var(--ok); }
+    .toast.err { background: var(--err); }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    .empty { text-align: center; color: var(--ink-faint); padding: 30px; font-size: 0.9rem; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 640px) {
+      .header-inner { padding: 12px 14px 0; }
+      main { padding: 16px 14px 80px; }
+      .brand h1 { font-size: 1.05rem; }
+      nav.tabs button { padding: 11px 12px; font-size: 0.85rem; }
+      .cal-cell { min-height: 72px; padding: 4px; }
+      .cal-daynum { font-size: 0.75rem; }
+      .ev-bar { font-size: 0.6rem; padding: 2px 4px; }
+      .holiday-tag { font-size: 0.55rem; }
+      .work-tag { display: none; }
+      .settings-bar .btn span.lbl { display: none; }
+      .settings-bar .btn { padding: 8px 10px; }
+      .modal-foot { flex-direction: column-reverse; }
+      .modal-foot .btn { width: 100%; justify-content: center; }
+      .modal-foot .spacer { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand-row">
+        <div class="brand">
+          <div class="logo">🌏</div>
+          <div>
+            <h1>Seoul &amp; Asia Planner</h1>
+            <div class="sub">10.07.2026 – 19.10.2026</div>
+          </div>
+        </div>
+        <div class="settings-bar">
+          <button class="btn" id="btn-export">📤 <span class="lbl">Backup exportieren</span></button>
+          <button class="btn" id="btn-import">📥 <span class="lbl">Backup importieren</span></button>
+          <button class="btn danger" id="btn-reset">♻️ <span class="lbl">Daten zurücksetzen</span></button>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button data-view="calendar" class="active">📅 Kalender</button>
+        <button data-view="slots">🗓️ Freie Slots</button>
+        <button data-view="ideas">💡 Ideenpool</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===================== KALENDER ===================== -->
+    <section class="view active" id="view-calendar">
+      <div class="section-title">
+        <h2>⏳ Countdowns</h2>
+        <button class="btn" id="btn-add-countdown">＋ Countdown</button>
+      </div>
+      <div class="countdown-grid" id="countdown-grid"></div>
+
+      <div class="section-title">
+        <h2>Kalender 2026</h2>
+        <span class="hint">Klicke auf einen Tag, um einen Eintrag anzulegen.</span>
+      </div>
+      <div class="card" style="padding:16px;">
+        <div class="cal-controls">
+          <button id="cal-prev" aria-label="Vorheriger Monat">‹</button>
+          <div class="mname" id="cal-monthname"></div>
+          <button id="cal-next" aria-label="Nächster Monat">›</button>
+        </div>
+        <div class="cal-grid" id="cal-head-row"></div>
+        <div class="cal-grid" id="cal-grid" style="margin-top:6px;"></div>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--sage-soft)"></i> Ausflug / Reise</span>
+          <span><i class="dot" style="background:var(--pink-soft)"></i> Termin</span>
+          <span><i class="dot" style="background:var(--lavender-soft)"></i> To-do</span>
+          <span><i class="dot" style="background:var(--sage-tint)"></i> Arbeitstag</span>
+          <span><i class="dot" style="background:var(--pink-tint)"></i> Wochenende</span>
+          <span><i class="dot" style="background:#fdf4e5"></i> Feiertag</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FREIE SLOTS ===================== -->
+    <section class="view" id="view-slots">
+      <div class="section-title">
+        <h2>Freie Zeitfenster</h2>
+        <span class="hint">Automatisch erkannt · 10.07.–19.10.2026</span>
+      </div>
+      <div class="slots-grid" id="slots-grid"></div>
+    </section>
+
+    <!-- ===================== IDEENPOOL ===================== -->
+    <section class="view" id="view-ideas">
+      <div class="section-title">
+        <h2>Ideenpool</h2>
+        <button class="btn primary" id="btn-add-idea">＋ Neue Idee</button>
+      </div>
+      <div class="ideas-grid" id="ideas-grid"></div>
+    </section>
+  </main>
+
+  <!-- Modals & Overlays -->
+  <div class="modal-overlay" id="modal-overlay"></div>
+  <div id="toasts"></div>
+  <input type="file" id="import-file" accept="application/json,.json" style="display:none" />
+
+  <script>
+  "use strict";
+  /* ============================================================
+     Seoul & Asia Planner 2026 — reines Vanilla JS
+     Datenhaltung ausschließlich in localStorage.
+     ============================================================ */
+
+  // ---------- Konstanten ----------
+  const STORAGE_KEY = "seoulAsiaPlanner_v1";
+  const RANGE_START = "2026-07-10";   // Planungszeitraum inklusive
+  const RANGE_END   = "2026-10-19";
+  const MONTHS_DE = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+  const WD_SHORT = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+  const WD_LONG  = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+  // Erlaubte Monate für die Kalendernavigation: Juli(6)–Oktober(9) 2026
+  const MIN_MONTH = 6, MAX_MONTH = 9, CAL_YEAR = 2026;
+
+  // Südkoreanische Feiertage 2026 (ISO-Datum -> Bezeichnung)
+  const HOLIDAYS = {
+    "2026-07-17": "Constitution Day / 제헌절",
+    "2026-08-15": "Liberation Day / 광복절",
+    "2026-08-17": "Ersatzfeiertag Liberation Day",
+    "2026-09-24": "Chuseok / 추석",
+    "2026-09-25": "Chuseok / 추석",
+    "2026-09-26": "Chuseok / 추석",
+    "2026-10-03": "National Foundation Day / 개천절",
+    "2026-10-05": "Ersatzfeiertag National Foundation Day",
+    "2026-10-09": "Hangeul Day / 한글날"
+  };
+
+  const CAT_LABEL = { trip: "Ausflug / Reise", appointment: "Termin", todo: "To-do" };
+  const DUR_LABEL = { half: "Halber Tag", "1": "1 Tag", "2": "2 Tage", "3": "3 Tage", "4plus": "4 Tage oder mehr" };
+  const DUR_NUM   = { half: 0.5, "1": 1, "2": 2, "3": 3, "4plus": 4 };
+
+  // ---------- Datums-Helfer (lokal, keine UTC-Verschiebung) ----------
+  function pad(n){ return String(n).padStart(2, "0"); }
+  function toISO(d){ return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); }
+  function fromISO(s){ const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); }
+  function addDays(iso, n){ const d = fromISO(iso); d.setDate(d.getDate()+n); return toISO(d); }
+  function todayISO(){ return toISO(new Date()); }
+  function daysDiff(a, b){ return Math.round((fromISO(b) - fromISO(a)) / 86400000); } // b - a in Tagen
+  function inRange(iso){ return iso >= RANGE_START && iso <= RANGE_END; }
+  function weekdayIdx(iso){ return fromISO(iso).getDay(); } // 0=So .. 6=Sa
+  function isWeekend(iso){ const d = weekdayIdx(iso); return d === 0 || d === 6; }
+  function isHoliday(iso){ return HOLIDAYS[iso] || null; }
+  // Deutsches Datum, z. B. "Sonntag, 12. Juli 2026"
+  function germanFull(iso){ const d = fromISO(iso); return WD_LONG[d.getDay()] + ", " + d.getDate() + ". " + MONTHS_DE[d.getMonth()] + " " + d.getFullYear(); }
+  function germanShort(iso){ const d = fromISO(iso); return d.getDate() + ". " + MONTHS_DE[d.getMonth()].slice(0,3) + " " + d.getFullYear(); }
+
+  function escapeHtml(s){
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  // ---------- Startdaten (nur beim allerersten Öffnen) ----------
+  function defaultData(){
+    return {
+      version: 1,
+      initialized: true,
+      entries: [
+        { id: uid(), title: "Hongdae erkunden", category: "trip", start: "2026-07-11", end: null, time: "", notes: "Hongdae, Yeonnam-dong, Cafés, Streetfood und abends die Stimmung genießen.", done: false, vacation: false },
+        { id: uid(), title: "Jeju Island", category: "trip", start: "2026-07-17", end: "2026-07-19", time: "", notes: "", done: false, vacation: false },
+        { id: uid(), title: "Tokyo", category: "trip", start: "2026-08-15", end: "2026-08-18", time: "", notes: "", done: false, vacation: false },
+        { id: uid(), title: "Indonesien-Reise", category: "trip", start: "2026-09-30", end: "2026-10-18", time: "", notes: "", done: false, vacation: false },
+        { id: uid(), title: "Rückkehr nach Deutschland", category: "trip", start: "2026-10-19", end: null, time: "", notes: "", done: false, vacation: false },
+        { id: uid(), title: "Urlaubstag verfügbar", category: "appointment", start: "2026-09-18", end: null, time: "", notes: "Ein verfügbarer Urlaubstag für einen möglichen längeren Ausflug. Vollständig editierbar.", done: false, vacation: true }
+      ],
+      countdowns: [
+        { id: uid(), title: "Jeju Island", target: "2026-07-17", note: "" },
+        { id: uid(), title: "Tokyo", target: "2026-08-15", note: "" },
+        { id: uid(), title: "Indonesien-Reise", target: "2026-09-30", note: "" },
+        { id: uid(), title: "Rückkehr nach Deutschland", target: "2026-10-19", note: "" }
+      ],
+      ideas: [
+        { id: uid(), title: "Seongsu-dong + Seoul Forest", duration: "1", note: "Cafés, kleine Shops, Spaziergang im Seoul Forest.", tags: ["Seoul","Stadt"] },
+        { id: uid(), title: "Ikseon-dong, Insadong & Gyeongbokgung", duration: "1", note: "Historisches Seoul, Hanok-Gassen und Palastbesuch.", tags: ["Seoul","Stadt"] },
+        { id: uid(), title: "Suwon Hwaseong", duration: "1", note: "Tagestrip zur Festung und durch die Altstadt.", tags: ["Tagestrip"] },
+        { id: uid(), title: "Bukhansan oder Inwangsan", duration: "1", note: "Wanderung; besonders gut bei klarer Sicht.", tags: ["Natur"] },
+        { id: uid(), title: "Jjimjilbang & Self-care-Tag", duration: "half", note: "Entspannen, Sauna, Essen und kein volles Programm.", tags: ["Entspannung","Seoul"] },
+        { id: uid(), title: "Busan", duration: "3", note: "Meer, Haeundae, Gamcheon Culture Village und Fischmarkt.", tags: ["Stadt","Natur"] },
+        { id: uid(), title: "Gyeongju + Busan", duration: "3", note: "Historisches Korea plus Küste.", tags: ["Stadt","Natur"] },
+        { id: uid(), title: "Sokcho + Seoraksan", duration: "3", note: "Berge, Natur und Ostküste.", tags: ["Natur"] },
+        { id: uid(), title: "Yeosu", duration: "3", note: "Küstenstadt, Seilbahn und entspannter Meer-Vibe.", tags: ["Natur","Entspannung"] },
+        { id: uid(), title: "Gangnam, COEX & Bongeunsa", duration: "1", note: "Starfield Library, Tempel und Jamsil/Gangnam.", tags: ["Seoul","Stadt"] },
+        { id: uid(), title: "Incheon Chinatown & Songdo", duration: "1", note: "Tagestrip mit Chinatown und moderner Küstenstadt.", tags: ["Tagestrip"] }
+      ]
+    };
+  }
+
+  // ---------- State + Persistenz ----------
+  let state = null;
+  let currentMonth = MIN_MONTH; // Kalender startet im Juli
+
+  function load(){
+    let raw = null;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch(e){ raw = null; }
+    if (!raw){
+      state = defaultData();
+      save();
+      return;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      // Robustheit: fehlende Felder ergänzen
+      state = {
+        version: 1,
+        initialized: true,
+        entries: Array.isArray(parsed.entries) ? parsed.entries : [],
+        countdowns: Array.isArray(parsed.countdowns) ? parsed.countdowns : [],
+        ideas: Array.isArray(parsed.ideas) ? parsed.ideas : []
+      };
+    } catch(e){
+      // Kaputte Daten -> Startdaten
+      state = defaultData();
+      save();
+    }
+  }
+  function save(){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch(e){ toast("Speichern fehlgeschlagen (Speicher voll?)", "err"); }
+  }
+
+  // ---------- Toast-Meldungen ----------
+  function toast(msg, type){
+    const t = document.createElement("div");
+    t.className = "toast" + (type ? " " + type : " ok");
+    t.textContent = (type === "err" ? "⚠️ " : "✓ ") + msg;
+    document.getElementById("toasts").appendChild(t);
+    setTimeout(() => { t.style.opacity = "0"; t.style.transition = ".3s"; setTimeout(() => t.remove(), 300); }, 2600);
+  }
+
+  // ============================================================
+  //  Freie-Slots-Logik
+  // ============================================================
+  // Liefert alle Einträge, die einen bestimmten Tag abdecken
+  function entriesOnDay(iso){
+    return state.entries.filter(e => {
+      const s = e.start; const en = e.end || e.start;
+      return iso >= s && iso <= en;
+    });
+  }
+  // Ist ein Eintrag ein "Urlaubstag"/freier Tag? (Flag oder Titel-Kennzeichnung)
+  function isVacationEntry(e){
+    return e.category === "appointment" && (e.vacation === true || /urlaubstag/i.test(e.title || ""));
+  }
+  // Prüft, ob ein Tag frei ist (nach den Regeln der Aufgabenstellung)
+  function dayIsFree(iso){
+    const covering = entriesOnDay(iso);
+    // Blockierend: Ausflug/Reise oder normaler Termin (aber KEIN Urlaubstag-Termin, keine To-dos)
+    const blocking = covering.filter(e =>
+      e.category === "trip" || (e.category === "appointment" && !isVacationEntry(e)));
+    if (blocking.length > 0) return false;
+
+    if (isWeekend(iso)) return true;              // Wochenende ist frei, wenn nicht blockiert
+    if (isHoliday(iso)) return true;              // Feiertag zählt als frei
+    // Werktag: frei nur, wenn ein Urlaubstag-Eintrag existiert
+    const vacation = covering.some(isVacationEntry);
+    return vacation;
+  }
+  // Erkennt zusammenhängende freie Zeitfenster im Planungszeitraum
+  function computeFreeSlots(){
+    const slots = [];
+    let cur = null;
+    let iso = RANGE_START;
+    while (iso <= RANGE_END){
+      if (dayIsFree(iso)){
+        if (!cur) cur = { start: iso, end: iso };
+        else cur.end = iso;
+      } else if (cur){
+        slots.push(cur); cur = null;
+      }
+      iso = addDays(iso, 1);
+    }
+    if (cur) slots.push(cur);
+    // Zusatzinfos berechnen
+    return slots.map(s => {
+      const len = daysDiff(s.start, s.end) + 1;
+      let hasSat = false, hasSun = false;
+      for (let i = 0; i < len; i++){ const d = weekdayIdx(addDays(s.start, i)); if (d === 6) hasSat = true; if (d === 0) hasSun = true; }
+      let type, cls;
+      if (len >= 3){ type = (hasSat || hasSun) ? "Verlängertes Wochenende" : "Langes Zeitfenster (3+ Tage)"; cls = "type-long"; }
+      else if (len === 2){ type = (hasSat && hasSun) ? "Wochenende" : "2 freie Tage"; cls = (hasSat && hasSun) ? "type-weekend" : "type-single"; }
+      else { type = isWeekend(s.start) ? "Freier Wochenendtag" : "Einzelner freier Tag"; cls = isWeekend(s.start) ? "type-weekend" : "type-single"; }
+      return { start: s.start, end: s.end, len, type, cls };
+    });
+  }
+  // Passende Ideen zu einem Slot (max. 3), nach Dauer gefiltert
+  function suggestionsForSlot(len){
+    let maxDur;
+    if (len <= 1) maxDur = 1;          // halber/ganzer Tag
+    else if (len === 2) maxDur = 2;
+    else if (len === 3) maxDur = 3;
+    else maxDur = Infinity;            // 4+ Tage: alles
+    return state.ideas
+      .filter(i => DUR_NUM[i.duration] <= maxDur)
+      .sort((a, b) => DUR_NUM[b.duration] - DUR_NUM[a.duration]) // längste passende zuerst
+      .slice(0, 3);
+  }
+
+  // ============================================================
+  //  Google-Calendar-Link
+  // ============================================================
+  function buildGoogleCalUrl(o){
+    // o: { title, start, end, time, notes }
+    const base = "https://calendar.google.com/calendar/render?action=TEMPLATE";
+    let dates;
+    if (o.time){
+      // Terminierter Eintrag: 1 Stunde Dauer, lokale (floating) Zeit
+      const [h, mi] = o.time.split(":").map(Number);
+      const startStr = o.start.replace(/-/g, "") + "T" + pad(h) + pad(mi) + "00";
+      const endD = fromISO(o.start); endD.setHours(h, mi + 60, 0);
+      const endStr = toISO(endD).replace(/-/g, "") + "T" + pad(endD.getHours()) + pad(endD.getMinutes()) + "00";
+      dates = startStr + "/" + endStr;
+    } else {
+      // Ganztägig: Enddatum EXKLUSIV (Google-Format)
+      const startStr = o.start.replace(/-/g, "");
+      const lastDay = o.end || o.start;
+      const endStr = addDays(lastDay, 1).replace(/-/g, ""); // exklusiv
+      dates = startStr + "/" + endStr;
+    }
+    const params = [
+      "text=" + encodeURIComponent(o.title || ""),
+      "dates=" + dates,
+      "details=" + encodeURIComponent(o.notes || "")
+    ];
+    return base + "&" + params.join("&");
+  }
+
+  // ============================================================
+  //  Rendering
+  // ============================================================
+  function renderAll(){
+    renderCountdowns();
+    renderCalendar();
+    renderSlots();
+    renderIdeas();
+  }
+
+  // ---------- Countdowns ----------
+  function renderCountdowns(){
+    const grid = document.getElementById("countdown-grid");
+    grid.innerHTML = "";
+    const today = todayISO();
+
+    // "Als Nächstes" = kleinster nicht-negativer Abstand
+    let nextId = null, nextDiff = Infinity;
+    state.countdowns.forEach(c => {
+      const d = daysDiff(today, c.target);
+      if (d >= 0 && d < nextDiff){ nextDiff = d; nextId = c.id; }
+    });
+
+    if (state.countdowns.length === 0){
+      grid.innerHTML = '<div class="empty">Noch keine Countdowns. Lege oben rechts einen an.</div>';
+      return;
+    }
+
+    state.countdowns.forEach((c, idx) => {
+      const d = daysDiff(today, c.target);
+      let numText, stateCls = "";
+      if (d > 0){ numText = "Noch " + d + (d === 1 ? " Tag" : " Tage"); }
+      else if (d === 0){ numText = "Heute"; stateCls = "today"; }
+      else { const ad = Math.abs(d); numText = "Vor " + ad + (ad === 1 ? " Tag" : " Tagen"); stateCls = "past"; }
+
+      const isNext = c.id === nextId;
+      const card = document.createElement("div");
+      card.className = "cd-card " + stateCls + (isNext ? " next" : "");
+      card.innerHTML =
+        (isNext ? '<span class="badge-next">Als Nächstes</span>' : '') +
+        '<div class="cd-num">' + escapeHtml(numText) + '</div>' +
+        '<div class="cd-title">' + escapeHtml(c.title) + '</div>' +
+        '<div class="cd-note">' + germanShort(c.target) + (c.note ? ' · ' + escapeHtml(c.note) : '') + '</div>' +
+        '<div class="cd-actions">' +
+          (idx > 0 ? '<button data-act="up" title="Nach oben">▲</button>' : '') +
+          (idx < state.countdowns.length - 1 ? '<button data-act="down" title="Nach unten">▼</button>' : '') +
+          '<button data-act="edit" title="Bearbeiten">✎</button>' +
+          '<button data-act="del" title="Löschen">🗑</button>' +
+        '</div>';
+      card.querySelectorAll(".cd-actions button").forEach(b => {
+        b.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          const act = b.dataset.act;
+          if (act === "up") moveCountdown(idx, -1);
+          else if (act === "down") moveCountdown(idx, 1);
+          else if (act === "edit") openCountdownModal(c);
+          else if (act === "del") deleteCountdown(c);
+        });
+      });
+      grid.appendChild(card);
+    });
+  }
+  function moveCountdown(idx, dir){
+    const arr = state.countdowns;
+    const j = idx + dir;
+    if (j < 0 || j >= arr.length) return;
+    [arr[idx], arr[j]] = [arr[j], arr[idx]];
+    save(); renderCountdowns();
+  }
+  function deleteCountdown(c){
+    openConfirm("Countdown löschen?", "„" + c.title + "“ wird entfernt.", () => {
+      state.countdowns = state.countdowns.filter(x => x.id !== c.id);
+      save(); renderCountdowns(); toast("Countdown gelöscht");
+    });
+  }
+
+  // ---------- Kalender ----------
+  function renderCalendar(){
+    // Kopfzeile (Wochentage Mo–So)
+    const headRow = document.getElementById("cal-head-row");
+    headRow.innerHTML = ["Mo","Di","Mi","Do","Fr","Sa","So"].map(w => '<div class="cal-head">' + w + '</div>').join("");
+
+    document.getElementById("cal-monthname").textContent = MONTHS_DE[currentMonth] + " " + CAL_YEAR;
+    document.getElementById("cal-prev").disabled = currentMonth <= MIN_MONTH;
+    document.getElementById("cal-next").disabled = currentMonth >= MAX_MONTH;
+
+    const grid = document.getElementById("cal-grid");
+    grid.innerHTML = "";
+
+    const first = new Date(CAL_YEAR, currentMonth, 1);
+    const lead = (first.getDay() + 6) % 7; // Montag-basierter Offset
+    const daysInMonth = new Date(CAL_YEAR, currentMonth + 1, 0).getDate();
+    const totalCells = Math.ceil((lead + daysInMonth) / 7) * 7;
+    const today = todayISO();
+
+    for (let cell = 0; cell < totalCells; cell++){
+      const dayNum = cell - lead + 1;
+      const div = document.createElement("div");
+      if (dayNum < 1 || dayNum > daysInMonth){
+        // Leerzelle vor/nach dem Monat
+        div.className = "cal-cell outside";
+        grid.appendChild(div);
+        continue;
+      }
+      const iso = CAL_YEAR + "-" + pad(currentMonth + 1) + "-" + pad(dayNum);
+      const editable = inRange(iso);
+      const holiday = isHoliday(iso);
+      const weekend = isWeekend(iso);
+      let cls = "cal-cell";
+      if (!editable) cls += " outside";
+      else if (holiday) cls += " holiday";
+      else if (weekend) cls += " weekend";
+      else cls += " workday";
+      if (editable) cls += " editable";
+      if (iso === today) cls += " today-cell";
+      div.className = cls;
+
+      let html = '<div class="cal-daynum">' + dayNum + '</div>';
+      if (holiday) html += '<div class="holiday-tag">🎌 ' + escapeHtml(holiday) + '</div>';
+      else if (editable && !weekend) html += '<div class="work-tag">Arbeitstag</div>';
+
+      // Einträge des Tages
+      const dayEntries = entriesOnDay(iso).sort((a, b) => {
+        const order = { trip: 0, appointment: 1, todo: 2 };
+        return order[a.category] - order[b.category];
+      });
+      const maxShow = 3;
+      dayEntries.slice(0, maxShow).forEach(e => {
+        const en = e.end || e.start;
+        const multi = en !== e.start;
+        let spanTxt = escapeHtml(e.title);
+        if (multi){
+          if (iso === e.start) spanTxt = "▸ " + spanTxt;
+          else if (iso === en) spanTxt = spanTxt + " ◂";
+          else spanTxt = "· " + spanTxt;
+        }
+        const bar = document.createElement("div");
+        bar.className = "ev-bar ev-" + e.category + (e.category === "todo" && e.done ? " done" : "");
+        bar.innerHTML = spanTxt;
+        bar.title = e.title;
+        bar.addEventListener("click", (ev) => { ev.stopPropagation(); openEntryModal(e); });
+        // vorläufig als HTML sammeln über container unten
+        div.appendChild(document.createElement("div")); // placeholder removed below
+        div.lastChild.replaceWith(bar);
+      });
+      // Vor den Einträgen den Header/Tags einfügen
+      div.insertAdjacentHTML("afterbegin", html);
+
+      if (dayEntries.length > maxShow){
+        const more = document.createElement("div");
+        more.className = "ev-more";
+        more.textContent = "+ " + (dayEntries.length - maxShow) + " weitere";
+        more.addEventListener("click", (ev) => { ev.stopPropagation(); openDayDetail(iso); });
+        div.appendChild(more);
+      }
+
+      if (editable){
+        div.addEventListener("click", () => {
+          if (dayEntries.length > 0) openDayDetail(iso);
+          else openEntryModal(null, { start: iso });
+        });
+      }
+      grid.appendChild(div);
+    }
+  }
+
+  // ---------- Freie Slots ----------
+  function renderSlots(){
+    const grid = document.getElementById("slots-grid");
+    const slots = computeFreeSlots();
+    if (slots.length === 0){
+      grid.innerHTML = '<div class="empty">Aktuell keine freien Zeitfenster im Planungszeitraum.</div>';
+      return;
+    }
+    grid.innerHTML = "";
+    slots.forEach(s => {
+      const rangeTxt = s.len === 1 ? germanFull(s.start)
+        : germanShort(s.start) + " – " + germanShort(s.end);
+      const suggestions = suggestionsForSlot(s.len);
+      const card = document.createElement("div");
+      card.className = "card slot-card";
+      let sgHtml = '<div class="slot-suggest"><div class="sg-label">Vorschläge aus dem Ideenpool</div>';
+      if (suggestions.length === 0){
+        sgHtml += '<div style="font-size:.8rem;color:var(--ink-faint)">Keine passende Idee gefunden.</div>';
+      } else {
+        suggestions.forEach(i => {
+          sgHtml += '<div class="sg-chip">' +
+            '<span>' + escapeHtml(i.title) + ' <span class="sg-dur">· ' + DUR_LABEL[i.duration] + '</span></span>' +
+            '<button data-idea="' + i.id + '" data-start="' + s.start + '" data-end="' + s.end + '">Einplanen</button>' +
+            '</div>';
+        });
+      }
+      sgHtml += '</div>';
+      card.innerHTML =
+        '<span class="slot-type ' + s.cls + '">' + s.type + '</span>' +
+        '<div class="slot-range">' + escapeHtml(rangeTxt) + '</div>' +
+        '<div class="slot-days">' + s.len + (s.len === 1 ? ' freier Tag' : ' freie Tage') + '</div>' +
+        sgHtml;
+      card.querySelectorAll(".sg-chip button").forEach(b => {
+        b.addEventListener("click", () => {
+          const idea = state.ideas.find(x => x.id === b.dataset.idea);
+          if (idea) planIdeaInSlot(idea, b.dataset.start, b.dataset.end);
+        });
+      });
+      grid.appendChild(card);
+    });
+  }
+  // Idee in ein konkretes freies Zeitfenster einplanen -> vorausgefülltes Modal
+  function planIdeaInSlot(idea, slotStart, slotEnd){
+    const durNum = DUR_NUM[idea.duration];
+    let end = slotStart;
+    if (durNum >= 2){
+      const wanted = addDays(slotStart, Math.ceil(durNum) - 1);
+      end = wanted <= slotEnd ? wanted : slotEnd; // nicht über den Slot hinaus
+    }
+    openEntryModal(null, {
+      title: idea.title,
+      category: "trip",
+      start: slotStart,
+      end: durNum >= 2 && end !== slotStart ? end : "",
+      notes: idea.note || ""
+    });
+  }
+
+  // ---------- Ideenpool ----------
+  function renderIdeas(){
+    const grid = document.getElementById("ideas-grid");
+    if (state.ideas.length === 0){
+      grid.innerHTML = '<div class="empty">Noch keine Ideen. Lege oben rechts eine an.</div>';
+      return;
+    }
+    grid.innerHTML = "";
+    state.ideas.forEach(i => {
+      const card = document.createElement("div");
+      card.className = "card idea-card";
+      const tags = (i.tags || []).map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join("");
+      card.innerHTML =
+        '<div class="idea-top"><h3>' + escapeHtml(i.title) + '</h3>' +
+        '<span class="idea-dur">' + DUR_LABEL[i.duration] + '</span></div>' +
+        (i.note ? '<div class="idea-note">' + escapeHtml(i.note) + '</div>' : '') +
+        (tags ? '<div class="idea-tags">' + tags + '</div>' : '') +
+        '<div class="idea-actions">' +
+          '<button class="btn primary" data-act="plan">📅 In Kalender einplanen</button>' +
+          '<button class="btn" data-act="edit">✎ Bearbeiten</button>' +
+          '<button class="btn danger" data-act="del">🗑</button>' +
+        '</div>';
+      card.querySelector('[data-act="plan"]').addEventListener("click", () => {
+        openEntryModal(null, { title: i.title, category: "trip", notes: i.note || "" });
+      });
+      card.querySelector('[data-act="edit"]').addEventListener("click", () => openIdeaModal(i));
+      card.querySelector('[data-act="del"]').addEventListener("click", () => {
+        openConfirm("Idee löschen?", "„" + i.title + "“ wird aus dem Ideenpool entfernt.", () => {
+          state.ideas = state.ideas.filter(x => x.id !== i.id);
+          save(); renderIdeas(); renderSlots(); toast("Idee gelöscht");
+        });
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  // ============================================================
+  //  Modal-Infrastruktur
+  // ============================================================
+  const overlay = document.getElementById("modal-overlay");
+  function closeModal(){ overlay.classList.remove("open"); overlay.innerHTML = ""; }
+  function openModal(node){
+    overlay.innerHTML = "";
+    overlay.appendChild(node);
+    overlay.classList.add("open");
+  }
+  // Klick auf Hintergrund schließt
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
+  // Escape schließt
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && overlay.classList.contains("open")) closeModal(); });
+
+  function modalShell(title, bodyHtml, footHtml){
+    const m = document.createElement("div");
+    m.className = "modal";
+    m.innerHTML =
+      '<div class="modal-head"><h3>' + escapeHtml(title) + '</h3>' +
+      '<button class="modal-close" aria-label="Schließen">✕</button></div>' +
+      '<div class="modal-body">' + bodyHtml + '</div>' +
+      '<div class="modal-foot">' + footHtml + '</div>';
+    m.querySelector(".modal-close").addEventListener("click", closeModal);
+    return m;
+  }
+
+  // ---------- Bestätigungsdialog ----------
+  function openConfirm(title, msg, onYes, yesLabel){
+    const m = modalShell(title,
+      '<p style="margin:0;color:var(--ink-soft)">' + escapeHtml(msg) + '</p>',
+      '<button class="btn ghost" data-x>Abbrechen</button>' +
+      '<button class="btn danger" data-y>' + escapeHtml(yesLabel || "Ja, fortfahren") + '</button>');
+    m.querySelector("[data-x]").addEventListener("click", closeModal);
+    m.querySelector("[data-y]").addEventListener("click", () => { closeModal(); onYes(); });
+    openModal(m);
+  }
+
+  // ---------- Tagesdetail ----------
+  function openDayDetail(iso){
+    const entries = entriesOnDay(iso).sort((a, b) => {
+      const order = { trip: 0, appointment: 1, todo: 2 };
+      return order[a.category] - order[b.category];
+    });
+    const holiday = isHoliday(iso);
+    let body = '';
+    if (holiday) body += '<div style="background:#fdf4e5;border-radius:10px;padding:8px 12px;font-size:.85rem;color:var(--gold);font-weight:600">🎌 ' + escapeHtml(holiday) + '</div>';
+    if (entries.length === 0){
+      body += '<p style="color:var(--ink-soft)">Keine Einträge an diesem Tag.</p>';
+    } else {
+      body += '<div style="display:flex;flex-direction:column;gap:8px">';
+      entries.forEach(e => {
+        const en = e.end || e.start;
+        const multi = en !== e.start;
+        body += '<div class="ev-bar ev-' + e.category + (e.category === "todo" && e.done ? " done" : "") +
+          '" data-id="' + e.id + '" style="cursor:pointer;font-size:.85rem;padding:10px 12px;display:flex;flex-direction:column;gap:2px">' +
+          '<strong>' + escapeHtml(e.title) + (e.time ? ' · ' + escapeHtml(e.time) + ' Uhr' : '') + '</strong>' +
+          '<span style="font-size:.75rem;opacity:.85">' + CAT_LABEL[e.category] +
+          (multi ? ' · ' + germanShort(e.start) + '–' + germanShort(en) : '') +
+          (e.category === "todo" ? (e.done ? ' · erledigt ✓' : ' · offen') : '') + '</span>' +
+          (e.notes ? '<span style="font-size:.75rem;opacity:.8">' + escapeHtml(e.notes) + '</span>' : '') +
+          '</div>';
+      });
+      body += '</div>';
+    }
+    const editable = inRange(iso);
+    const m = modalShell(germanFull(iso), body,
+      (editable ? '<button class="btn primary" data-new>＋ Eintrag hinzufügen</button>' : '') +
+      '<div class="spacer"></div><button class="btn ghost" data-close>Schließen</button>');
+    m.querySelector("[data-close]").addEventListener("click", closeModal);
+    if (editable) m.querySelector("[data-new]").addEventListener("click", () => { closeModal(); openEntryModal(null, { start: iso }); });
+    m.querySelectorAll(".ev-bar[data-id]").forEach(el => {
+      el.addEventListener("click", () => {
+        const e = state.entries.find(x => x.id === el.dataset.id);
+        if (e){ closeModal(); openEntryModal(e); }
+      });
+    });
+    openModal(m);
+  }
+
+  // ---------- Eintrags-Modal (Anlegen / Bearbeiten) ----------
+  function openEntryModal(entry, prefill){
+    prefill = prefill || {};
+    const isEdit = !!entry;
+    const e = entry || {};
+    const title = e.title != null ? e.title : (prefill.title || "");
+    const cat = e.category || prefill.category || "trip";
+    const start = e.start || prefill.start || "";
+    const end = e.end || prefill.end || "";
+    const time = e.time || prefill.time || "";
+    const notes = e.notes != null ? e.notes : (prefill.notes || "");
+    const done = e.done || false;
+    const vacation = e.vacation || false;
+
+    const body =
+      '<div class="field-err" id="entry-err"></div>' +
+      '<div class="field"><label>Titel <span class="req">*</span></label>' +
+        '<input id="f-title" type="text" value="' + escapeHtml(title) + '" placeholder="z. B. Ausflug nach Busan" /></div>' +
+      '<div class="field"><label>Kategorie <span class="req">*</span></label>' +
+        '<select id="f-cat">' +
+          '<option value="trip"' + (cat==="trip"?" selected":"") + '>Ausflug / Reise</option>' +
+          '<option value="appointment"' + (cat==="appointment"?" selected":"") + '>Termin</option>' +
+          '<option value="todo"' + (cat==="todo"?" selected":"") + '>To-do</option>' +
+        '</select></div>' +
+      '<div class="field row2">' +
+        '<div class="field"><label>Startdatum <span class="req">*</span></label>' +
+          '<input id="f-start" type="date" value="' + escapeHtml(start) + '" min="2026-07-01" max="2026-10-31" /></div>' +
+        '<div class="field"><label>Enddatum (optional)</label>' +
+          '<input id="f-end" type="date" value="' + escapeHtml(end) + '" min="2026-07-01" max="2026-10-31" /></div>' +
+      '</div>' +
+      '<div class="field"><label>Uhrzeit (optional)</label>' +
+        '<input id="f-time" type="time" value="' + escapeHtml(time) + '" /></div>' +
+      '<div class="field"><label>Notizen (optional)</label>' +
+        '<textarea id="f-notes" placeholder="Details, Ideen, Links …">' + escapeHtml(notes) + '</textarea></div>' +
+      '<label class="checkline" id="wrap-done" style="display:' + (cat==="todo"?"flex":"none") + '">' +
+        '<input type="checkbox" id="f-done"' + (done?" checked":"") + ' /> Erledigt</label>' +
+      '<label class="checkline" id="wrap-vac" style="display:' + (cat==="appointment"?"flex":"none") + '">' +
+        '<input type="checkbox" id="f-vac"' + (vacation?" checked":"") + ' /> Als freier Tag / Urlaubstag behandeln</label>';
+
+    const foot =
+      (isEdit ? '<button class="btn danger" data-del>🗑 Löschen</button>' : '') +
+      '<button class="btn" data-gcal>📆 Zu Google Calendar</button>' +
+      '<div class="spacer"></div>' +
+      '<button class="btn ghost" data-x>Abbrechen</button>' +
+      '<button class="btn primary" data-save>Speichern</button>';
+
+    const m = modalShell(isEdit ? "Eintrag bearbeiten" : "Neuer Eintrag", body, foot);
+
+    // Kategorie-abhängige Felder ein-/ausblenden
+    const catSel = m.querySelector("#f-cat");
+    catSel.addEventListener("change", () => {
+      m.querySelector("#wrap-done").style.display = catSel.value === "todo" ? "flex" : "none";
+      m.querySelector("#wrap-vac").style.display = catSel.value === "appointment" ? "flex" : "none";
+    });
+
+    function readForm(){
+      return {
+        title: m.querySelector("#f-title").value.trim(),
+        category: m.querySelector("#f-cat").value,
+        start: m.querySelector("#f-start").value,
+        end: m.querySelector("#f-end").value || null,
+        time: m.querySelector("#f-time").value || "",
+        notes: m.querySelector("#f-notes").value.trim(),
+        done: m.querySelector("#f-done").checked,
+        vacation: m.querySelector("#f-vac").checked
+      };
+    }
+    function showErr(msg){
+      const box = m.querySelector("#entry-err");
+      box.textContent = msg; box.classList.add("show");
+    }
+    function validate(d){
+      if (!d.title) return "Bitte einen Titel eingeben.";
+      if (!d.category) return "Bitte eine Kategorie wählen.";
+      if (!d.start) return "Bitte ein Startdatum wählen.";
+      if (!inRange(d.start)) return "Das Startdatum muss zwischen 10.07. und 19.10.2026 liegen.";
+      if (d.end){
+        if (d.end < d.start) return "Das Enddatum darf nicht vor dem Startdatum liegen.";
+        if (!inRange(d.end)) return "Das Enddatum muss zwischen 10.07. und 19.10.2026 liegen.";
+      }
+      return null;
+    }
+
+    m.querySelector("[data-x]").addEventListener("click", closeModal);
+    m.querySelector("[data-save]").addEventListener("click", () => {
+      const d = readForm();
+      const err = validate(d);
+      if (err){ showErr(err); return; }
+      if (isEdit){
+        Object.assign(entry, d);
+        toast("Eintrag aktualisiert");
+      } else {
+        state.entries.push(Object.assign({ id: uid() }, d));
+        toast("Eintrag gespeichert");
+      }
+      save(); closeModal(); renderAll();
+    });
+    m.querySelector("[data-gcal]").addEventListener("click", () => {
+      const d = readForm();
+      if (!d.title || !d.start){ showErr("Für Google Calendar werden Titel und Startdatum benötigt."); return; }
+      window.open(buildGoogleCalUrl(d), "_blank", "noopener");
+    });
+    if (isEdit){
+      m.querySelector("[data-del]").addEventListener("click", () => {
+        openConfirm("Eintrag löschen?", "„" + entry.title + "“ wird dauerhaft entfernt.", () => {
+          state.entries = state.entries.filter(x => x.id !== entry.id);
+          save(); renderAll(); toast("Eintrag gelöscht");
+        });
+      });
+    }
+    openModal(m);
+    setTimeout(() => m.querySelector("#f-title").focus(), 50);
+  }
+
+  // ---------- Countdown-Modal ----------
+  function openCountdownModal(cd){
+    const isEdit = !!cd;
+    const c = cd || {};
+    const body =
+      '<div class="field-err" id="cd-err"></div>' +
+      '<div class="field"><label>Titel <span class="req">*</span></label>' +
+        '<input id="c-title" type="text" value="' + escapeHtml(c.title || "") + '" placeholder="z. B. Jeju Island" /></div>' +
+      '<div class="field"><label>Zieldatum <span class="req">*</span></label>' +
+        '<input id="c-date" type="date" value="' + escapeHtml(c.target || "") + '" /></div>' +
+      '<div class="field"><label>Notiz (optional)</label>' +
+        '<input id="c-note" type="text" value="' + escapeHtml(c.note || "") + '" placeholder="kurze Notiz" /></div>';
+    const m = modalShell(isEdit ? "Countdown bearbeiten" : "Neuer Countdown", body,
+      '<div class="spacer"></div><button class="btn ghost" data-x>Abbrechen</button><button class="btn primary" data-save>Speichern</button>');
+    m.querySelector("[data-x]").addEventListener("click", closeModal);
+    m.querySelector("[data-save]").addEventListener("click", () => {
+      const title = m.querySelector("#c-title").value.trim();
+      const target = m.querySelector("#c-date").value;
+      const note = m.querySelector("#c-note").value.trim();
+      const box = m.querySelector("#cd-err");
+      if (!title){ box.textContent = "Bitte einen Titel eingeben."; box.classList.add("show"); return; }
+      if (!target){ box.textContent = "Bitte ein Zieldatum wählen."; box.classList.add("show"); return; }
+      if (isEdit){ cd.title = title; cd.target = target; cd.note = note; toast("Countdown aktualisiert"); }
+      else { state.countdowns.push({ id: uid(), title, target, note }); toast("Countdown angelegt"); }
+      save(); closeModal(); renderCountdowns();
+    });
+    openModal(m);
+    setTimeout(() => m.querySelector("#c-title").focus(), 50);
+  }
+
+  // ---------- Ideen-Modal ----------
+  function openIdeaModal(idea){
+    const isEdit = !!idea;
+    const i = idea || {};
+    const body =
+      '<div class="field-err" id="i-err"></div>' +
+      '<div class="field"><label>Titel <span class="req">*</span></label>' +
+        '<input id="i-title" type="text" value="' + escapeHtml(i.title || "") + '" placeholder="z. B. Busan" /></div>' +
+      '<div class="field"><label>Vorgeschlagene Dauer <span class="req">*</span></label>' +
+        '<select id="i-dur">' +
+          Object.keys(DUR_LABEL).map(k => '<option value="' + k + '"' + ((i.duration||"1")===k?" selected":"") + '>' + DUR_LABEL[k] + '</option>').join("") +
+        '</select></div>' +
+      '<div class="field"><label>Notiz / Beschreibung (optional)</label>' +
+        '<textarea id="i-note" placeholder="kurze Beschreibung">' + escapeHtml(i.note || "") + '</textarea></div>' +
+      '<div class="field"><label>Tags (optional, mit Komma getrennt)</label>' +
+        '<input id="i-tags" type="text" value="' + escapeHtml((i.tags||[]).join(", ")) + '" placeholder="Seoul, Natur, Tagestrip" /></div>';
+    const m = modalShell(isEdit ? "Idee bearbeiten" : "Neue Idee", body,
+      '<div class="spacer"></div><button class="btn ghost" data-x>Abbrechen</button><button class="btn primary" data-save>Speichern</button>');
+    m.querySelector("[data-x]").addEventListener("click", closeModal);
+    m.querySelector("[data-save]").addEventListener("click", () => {
+      const title = m.querySelector("#i-title").value.trim();
+      const duration = m.querySelector("#i-dur").value;
+      const note = m.querySelector("#i-note").value.trim();
+      const tags = m.querySelector("#i-tags").value.split(",").map(s => s.trim()).filter(Boolean);
+      const box = m.querySelector("#i-err");
+      if (!title){ box.textContent = "Bitte einen Titel eingeben."; box.classList.add("show"); return; }
+      if (isEdit){ Object.assign(idea, { title, duration, note, tags }); toast("Idee aktualisiert"); }
+      else { state.ideas.push({ id: uid(), title, duration, note, tags }); toast("Idee angelegt"); }
+      save(); closeModal(); renderIdeas(); renderSlots();
+    });
+    openModal(m);
+    setTimeout(() => m.querySelector("#i-title").focus(), 50);
+  }
+
+  // ============================================================
+  //  Backup: Export / Import + Reset
+  // ============================================================
+  function exportBackup(){
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "seoul-asia-planner-backup-" + todayISO() + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast("Backup exportiert");
+  }
+
+  function validateImport(obj){
+    // Grundstruktur prüfen
+    if (typeof obj !== "object" || obj === null) return "Datei enthält kein gültiges Objekt.";
+    if (!Array.isArray(obj.entries) || !Array.isArray(obj.countdowns) || !Array.isArray(obj.ideas))
+      return "Die Datei enthält nicht die erwarteten Bereiche (entries, countdowns, ideas).";
+    // Einträge prüfen
+    for (const e of obj.entries){
+      if (!e || typeof e.title !== "string" || typeof e.start !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(e.start))
+        return "Mindestens ein Eintrag ist ungültig (Titel/Startdatum fehlt).";
+      if (!["trip","appointment","todo"].includes(e.category))
+        return "Mindestens ein Eintrag hat eine unbekannte Kategorie.";
+    }
+    for (const c of obj.countdowns){
+      if (!c || typeof c.title !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(c.target || ""))
+        return "Mindestens ein Countdown ist ungültig.";
+    }
+    for (const i of obj.ideas){
+      if (!i || typeof i.title !== "string" || !DUR_LABEL[i.duration])
+        return "Mindestens eine Idee ist ungültig (Titel/Dauer).";
+    }
+    return null;
+  }
+
+  function importBackup(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      let obj;
+      try { obj = JSON.parse(reader.result); }
+      catch(err){ toast("Datei ist kein gültiges JSON.", "err"); return; }
+      const errMsg = validateImport(obj);
+      if (errMsg){ toast(errMsg, "err"); return; }
+      openConfirm("Backup importieren?",
+        "Der aktuelle Datenbestand wird vollständig ersetzt (" +
+        obj.entries.length + " Einträge, " + obj.countdowns.length + " Countdowns, " + obj.ideas.length + " Ideen).",
+        () => {
+          state = {
+            version: 1, initialized: true,
+            entries: obj.entries.map(e => Object.assign({ id: e.id || uid(), end: null, time: "", notes: "", done: false, vacation: false }, e)),
+            countdowns: obj.countdowns.map(c => Object.assign({ id: c.id || uid(), note: "" }, c)),
+            ideas: obj.ideas.map(i => Object.assign({ id: i.id || uid(), note: "", tags: [] }, i))
+          };
+          save(); renderAll(); toast("Backup importiert");
+        }, "Ja, ersetzen");
+    };
+    reader.onerror = () => toast("Datei konnte nicht gelesen werden.", "err");
+    reader.readAsText(file);
+  }
+
+  function resetData(){
+    openConfirm("Alle Daten zurücksetzen?",
+      "Alle eigenen Einträge, Countdowns und Ideen werden gelöscht und durch die Startdaten ersetzt. Das kann nicht rückgängig gemacht werden.",
+      () => {
+        state = defaultData();
+        save(); currentMonth = MIN_MONTH; renderAll(); toast("Daten zurückgesetzt");
+      }, "Ja, zurücksetzen");
+  }
+
+  // ============================================================
+  //  Navigation & globale Events
+  // ============================================================
+  function switchView(name){
+    document.querySelectorAll("nav.tabs button").forEach(b => b.classList.toggle("active", b.dataset.view === name));
+    document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + name));
+  }
+
+  function init(){
+    load();
+
+    document.querySelectorAll("nav.tabs button").forEach(b => {
+      b.addEventListener("click", () => switchView(b.dataset.view));
+    });
+    document.getElementById("cal-prev").addEventListener("click", () => {
+      if (currentMonth > MIN_MONTH){ currentMonth--; renderCalendar(); }
+    });
+    document.getElementById("cal-next").addEventListener("click", () => {
+      if (currentMonth < MAX_MONTH){ currentMonth++; renderCalendar(); }
+    });
+
+    document.getElementById("btn-add-countdown").addEventListener("click", () => openCountdownModal(null));
+    document.getElementById("btn-add-idea").addEventListener("click", () => openIdeaModal(null));
+
+    document.getElementById("btn-export").addEventListener("click", exportBackup);
+    document.getElementById("btn-reset").addEventListener("click", resetData);
+    const fileInput = document.getElementById("import-file");
+    document.getElementById("btn-import").addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files && fileInput.files[0]) importBackup(fileInput.files[0]);
+      fileInput.value = ""; // erlaubt erneuten Import derselben Datei
+    });
+
+    // Kalender startet im Monat von heute, falls im erlaubten Bereich
+    const nowM = new Date().getFullYear() === CAL_YEAR ? new Date().getMonth() : MIN_MONTH;
+    currentMonth = Math.min(MAX_MONTH, Math.max(MIN_MONTH, nowM));
+
+    renderAll();
+  }
+
+  init();
+  </script>
+</body>
+</html>
